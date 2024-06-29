@@ -123,3 +123,26 @@ Alternatively, you can run the run.py script which uses the data/diamonds.csv fi
 ```bash
 python run.py
 ```
+
+For each run, the results are stored in experiments/experiments_tracking.json, while the model is saved in a folder named with the uuid of the experiment.
+
+Following a log record of an experiment:
+
+```json
+{
+    "uuid": "05a9ec3b-3552-421c-92ec-2017f6b95b6e",
+    "timestamp": "2024-06-29T22:26:14.730766",
+    "date": "2024-06-29 22:26",
+    "model_name": "LinearRegression",
+    "model_params": {
+        "copy_X": true,
+        "fit_intercept": true,
+        "n_jobs": null,
+        "positive": false
+    },
+    "results": {
+        "r2": 0.9074,
+        "mae": 557.98
+    }
+}
+```
