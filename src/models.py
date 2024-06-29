@@ -58,7 +58,8 @@ class Model:
         else:
             return self.model.predict(X)
 
-    def evaluate(self, y: pd.Series, y_predicted: np.ndarray) -> Tuple[float, float]:
+    @staticmethod
+    def evaluate(y: pd.Series, y_predicted: np.ndarray) -> Tuple[float, float]:
         """
         Evaluates the model performance.
 
