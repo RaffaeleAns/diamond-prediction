@@ -68,4 +68,58 @@ Observability is key. Save every request and response made to the APIs to a **pr
 ---
 
 ## How to run
-Please fill this section as part of the assignment.
+### Prerequisites
+Before running the pipeline, ensure you have the following:
+
+- Python installed (version 3.12)
+- Required Python packages installed (found in requirements.txt)
+
+You can install the required packages using the following command:
+
+```bash
+pip install requirements.txt
+```
+
+### Getting started
+#### Step 1: Prepare your dataset
+
+Ensure your dataset include the following columns:
+
+- carat: float
+- cut: str
+- color: str
+- clarity: str
+- x: float
+- y: float
+- z: float
+- price: int
+
+if any unexpected column is found, the pipeline will raise an error.
+Also, ensure the columns have the correct type.
+
+#### Step 2: Run the Pipeline
+You can run the training pipeline using the following Python code:
+
+```python
+import pandas as pd
+from src.models import TrainingPipeline
+
+# Load the dataset
+df = pd.read_csv('yourfile.csv')
+
+# Initialize the training pipeline
+pipeline = TrainingPipeline(input_data=df)
+
+# Train the model
+experiment_id, r2, mae = pipeline.train()
+
+print(f"Experiment ID: {experiment_id}")
+print(f"R2 Score: {r2}")
+print(f"Mean Absolute Error: {mae}")
+```
+
+Alternatively, you can run the run.py script which uses the data/diamonds.csv file:
+
+```bash
+python run.py
+```
