@@ -6,7 +6,7 @@ import pickle
 import pandas as pd
 import numpy as np
 
-from utils import Config, default_config
+from src.utils import Config, default_config
 
 from typing import List
 from pydantic import BaseModel, Field
