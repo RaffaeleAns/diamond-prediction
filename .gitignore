@@ -166,3 +166,8 @@ cython_debug/
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
 /.idea/xtream-ai-assignment-developer.iml
+/.idea/diamond-prediction.iml
+
+
+# models
+/experiments/*/*.pkl

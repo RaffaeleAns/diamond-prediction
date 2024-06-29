@@ -1,0 +1,18 @@
+[
+    {
+        "uuid": "05a9ec3b-3552-421c-92ec-2017f6b95b6e",
+        "timestamp": "2024-06-29T22:26:14.730766",
+        "date": "2024-06-29 22:26",
+        "model_name": "LinearRegression",
+        "model_params": {
+            "copy_X": true,
+            "fit_intercept": true,
+            "n_jobs": null,
+            "positive": false
+        },
+        "results": {
+            "r2": 0.9074,
+            "mae": 557.98
+        }
+    }
+]
