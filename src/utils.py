@@ -1,6 +1,7 @@
 import json
 from typing import Any, Dict, Optional
 
+
 class Config:
     def __init__(self, config_path: str):
         """
@@ -37,6 +38,7 @@ class Config:
             Any: The value from the configuration, or the default value if the key is not found.
         """
         return self.config.get(key, default)
+
 
 # Load the default configuration
 default_config = Config("config.json")

@@ -1,4 +1,4 @@
-from src.lib import TrainingPipeline
+from src.models import TrainingPipeline
 
 import pandas as pd
 
