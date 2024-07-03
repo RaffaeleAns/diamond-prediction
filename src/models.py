@@ -13,7 +13,7 @@ from datetime import datetime
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_absolute_error
 
-from data import Data
+from src.data import Data
 from src.utils import Config, default_config
 
 logger = logging.getLogger(__name__)
