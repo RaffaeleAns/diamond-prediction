@@ -18,6 +18,8 @@ class DataFrameValidator(BaseModel):
     cut: List[str] = Field(...)
     color: List[str] = Field(...)
     clarity: List[str] = Field(...)
+    depth: List[float] = Field(...)
+    table: List[float] = Field(...)
     x: List[float] = Field(...)
     y: List[float] = Field(...)
     z: List[float] = Field(...)
