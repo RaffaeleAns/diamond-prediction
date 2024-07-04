@@ -64,12 +64,13 @@ class DataFrameValidator(BaseModel):
 
 
 class Data:
-    def __init__(self, data: pd.DataFrame, config: Config = default_config):
+    def __init__(self, data: pd.DataFrame, model_name: str, config: Config = default_config):
         """
         Initializes the Data object with input data and configuration.
 
         Args:
             data (pd.DataFrame): The input data for training.
+            model_name (str): The name of the model.
             config (Config): The configuration object.
         """
         self.X_train: Optional[pd.DataFrame] = None
@@ -79,9 +80,10 @@ class Data:
 
         self.data = data
         self.config = config
+        self.model_config = self.config.get_model_config(model_name)
 
         self._input_validation()
-        self._load_validation_data(self.config.get('validation_x_path'), self.config.get('validation_y_path'))
+        self._load_validation_data(self.model_config.get('validation_x_path'), self.model_config.get('validation_y_path'))
 
     def _input_validation(self) -> None:
         """
@@ -104,26 +106,22 @@ class Data:
         self.y_val = pd.read_csv(validation_y_path, sep=';', index_col=0)
         logger.info("Validation data loaded successfully.")
 
-    def preprocess(self, get_dummies: bool = True, log_y: bool = True) -> None:
+    def preprocess(self) -> None:
         """
-        Preprocesses the training data.
-
-        Args:
-            get_dummies (bool): Whether to convert categorical variables to dummy/indicator variables.
-            log_y (bool): Whether to apply logarithmic transformation to the target variable.
+        Preprocesses the training data. Choose the preprocessing actions based on config file
         """
         logger.info("Starting preprocessing of training data.")
         self.data = self.data[self.data.x * self.data.y * self.data.z != 0]
         self.data = self.data[self.data.price > 0]
         self.y_train = self.data['price']
 
-        if get_dummies:
+        if self.model_config.get('get_dummies'):
             logger.info("Applying get_dummies to categorical columns.")
             self.data = pd.get_dummies(self.data, columns=['cut', 'color', 'clarity'], drop_first=True)
 
-        if log_y:
+        if self.model_config.get('log_y'):
             logger.info("Applying logarithmic transformation to the target variable.")
             self.y_train = np.log(self.y_train)
 
-        self.X_train = self.data[self.config.get('training_features')]
+        self.X_train = self.data[self.model_config.get('training_features')]
         logger.info("Preprocessing completed.")

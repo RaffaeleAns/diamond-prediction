@@ -1,11 +1,16 @@
 {
     "experiment_directory": "experiments",
     "experiment_file": "experiments/experiments_tracking.json",
-    "validation_x_path": "data/support/diamonds_x_val.csv",
-    "validation_y_path": "data/support/diamonds_y_val.csv",
-    "log_y": true,
-    "training_features": ["carat", "x", "cut_Good", "cut_Ideal", "cut_Premium", "cut_Very Good",
+    "model_config": {
+      "LinearRegressionModel": {
+        "log_y": true,
+        "get_dummies": true,
+        "get_categorical": false,
+        "training_features": ["carat", "x", "cut_Good", "cut_Ideal", "cut_Premium", "cut_Very Good",
        "color_E", "color_F", "color_G", "color_H", "color_I", "color_J",
        "clarity_IF", "clarity_SI1", "clarity_SI2", "clarity_VS1",
-       "clarity_VS2", "clarity_VVS1", "clarity_VVS2"]
-}
+       "clarity_VS2", "clarity_VVS1", "clarity_VVS2"],
+          "validation_x_path": "data/support/diamonds_x_val.csv",
+    "validation_y_path": "data/support/diamonds_y_val.csv"
+      }
+}}

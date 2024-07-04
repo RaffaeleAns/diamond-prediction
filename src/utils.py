@@ -39,6 +39,19 @@ class Config:
         """
         return self.config.get(key, default)
 
+    def get_model_config(self, model_name: str, default: Optional[Any] = None) -> Dict[str, Any]:
+        """
+        Retrieves a model configuration from the configuration.
+
+        Args:
+            model_name (str): The key to look up in the configuration.
+            default (Optional[Any]): The default value to return if the key is not found.
+
+        Returns:
+            Any: The model configuration dict
+        """
+        return self.config.get('model_config').get(model_name, default)
+
 
 # Load the default configuration
 default_config = Config("config.json")

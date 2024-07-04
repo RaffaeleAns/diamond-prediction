@@ -40,11 +40,15 @@ class BaseModel(ABC):
 
 
 class LinearRegressionModel(BaseModel):
-    def __init__(self) -> None:
+    def __init__(self, config : Config = default_config) -> None:
         """
         Initializes the Model object.
         """
         self.model_name = self.__class__.__name__
+
+        self.config = config
+        self.model_config = self.config.get_model_config(self.model_name)
+
 
         self.model = LinearRegression()
 
@@ -62,7 +66,7 @@ class LinearRegressionModel(BaseModel):
         self.model.fit(X, y)
         logger.info("Model training completed.")
 
-    def predict(self, X: pd.DataFrame, log_y: bool = True) -> np.ndarray:
+    def predict(self, X: pd.DataFrame) -> np.ndarray:
         """
         Makes predictions using the trained model.
 
@@ -74,7 +78,8 @@ class LinearRegressionModel(BaseModel):
             np.ndarray: The predicted values.
         """
         logger.info("Making predictions.")
-        if log_y:
+        if self.model_config.get('log_y'):
+            logger.info("returning exponential predictions")
             return np.exp(self.model.predict(X))
         else:
             return self.model.predict(X)
@@ -99,7 +104,7 @@ class LinearRegressionModel(BaseModel):
 
 
 class TrainingPipeline:
-    def __init__(self, input_data: pd.DataFrame, config: Config = default_config):
+    def __init__(self, input_data: pd.DataFrame, model_name: str, config: Config = default_config):
         """
         Initializes the TrainingPipeline object with input data and configuration.
 
@@ -108,8 +113,8 @@ class TrainingPipeline:
             config (Config): The configuration object.
         """
         self.config = config
-        self.data = Data(input_data, config)
-        self.data.preprocess(log_y=self.config.get('log_y'))
+        self.data = Data(input_data, model_name, config)
+        self.data.preprocess()
 
         self.model = LinearRegressionModel()
         os.makedirs(self.config.get("experiment_directory"), exist_ok=True)
@@ -123,7 +128,7 @@ class TrainingPipeline:
         """
         logger.info("Starting training pipeline.")
         self.model.train(self.data.X_train, self.data.y_train)
-        validation_preds = self.model.predict(self.data.X_val, log_y=self.config.get('log_y'))
+        validation_preds = self.model.predict(self.data.X_val)
         r2, mae = self.model.evaluate(self.data.y_val, validation_preds)
 
         experiment_id = self._log_experiment(r2, mae)
