@@ -1,9 +1,9 @@
 [
     {
-        "uuid": "05a9ec3b-3552-421c-92ec-2017f6b95b6e",
-        "timestamp": "2024-06-29T22:26:14.730766",
-        "date": "2024-06-29 22:26",
-        "model_name": "LinearRegression",
+        "uuid": "a7a88bec-d86b-463e-8596-5c4696115815",
+        "timestamp": "2024-07-04T22:45:56.325506",
+        "date": "2024-07-04 22:45",
+        "model_name": "LinearRegressionModel",
         "model_params": {
             "copy_X": true,
             "fit_intercept": true,
@@ -13,6 +13,57 @@
         "results": {
             "r2": 0.9074,
             "mae": 557.98
+        }
+    },
+    {
+        "uuid": "7bc638f0-5cdb-4b8b-a22f-7caf25b2f049",
+        "timestamp": "2024-07-04T22:46:10.796322",
+        "date": "2024-07-04 22:46",
+        "model_name": "XGBoostModel",
+        "model_params": {
+            "objective": "reg:squarederror",
+            "base_score": null,
+            "booster": null,
+            "callbacks": null,
+            "colsample_bylevel": null,
+            "colsample_bynode": null,
+            "colsample_bytree": null,
+            "device": null,
+            "early_stopping_rounds": null,
+            "enable_categorical": true,
+            "eval_metric": null,
+            "feature_types": null,
+            "gamma": null,
+            "grow_policy": null,
+            "importance_type": null,
+            "interaction_constraints": null,
+            "learning_rate": null,
+            "max_bin": null,
+            "max_cat_threshold": null,
+            "max_cat_to_onehot": null,
+            "max_delta_step": null,
+            "max_depth": null,
+            "max_leaves": null,
+            "min_child_weight": null,
+            "missing": NaN,
+            "monotone_constraints": null,
+            "multi_strategy": null,
+            "n_estimators": null,
+            "n_jobs": null,
+            "num_parallel_tree": null,
+            "random_state": 42,
+            "reg_alpha": null,
+            "reg_lambda": null,
+            "sampling_method": null,
+            "scale_pos_weight": null,
+            "subsample": null,
+            "tree_method": null,
+            "validate_parameters": null,
+            "verbosity": null
+        },
+        "results": {
+            "r2": 0.998,
+            "mae": 111.35
         }
     }
 ]
