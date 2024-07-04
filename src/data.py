@@ -49,10 +49,11 @@ class DataFrameValidator(BaseModel):
             raise ValueError(f"Unexpected columns: {unexpected_columns}")
 
         for column, expected_type in Features.__annotations__.items():
-            python_type = expected_type
-            if not all(isinstance(value, python_type) for value in df[column]):
-                logger.error(f"Column '{column}' does not have all values of type '{python_type.__name__}'")
-                raise ValueError(f"Column '{column}' does not have all values of type '{python_type.__name__}'")
+            if column in df_columns:
+                python_type = expected_type
+                if not all(isinstance(value, python_type) for value in df[column]):
+                    logger.error(f"Column '{column}' does not have all values of type '{python_type.__name__}'")
+                    raise ValueError(f"Column '{column}' does not have all values of type '{python_type.__name__}'")
 
         data = df.to_dict(orient='list')
         cls(**data)
