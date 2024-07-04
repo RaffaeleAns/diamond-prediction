@@ -22,3 +22,11 @@ class PredictPayload(BaseModel):
     model: str
     features: Features
     target: Optional[Target] = None
+
+
+class SimilarityPayload(BaseModel):
+    carat: float
+    cut: str
+    color: str
+    clarity: str
+    n: int
