@@ -18,6 +18,7 @@ from sklearn.metrics import r2_score, mean_absolute_error
 from src.data import Data
 from src.utils import Config, default_config
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -56,7 +57,7 @@ class BaseModel(ABC):
         pass
 
     def load_best_model(self, model_name: str):
-        experiments_tracking_file = json.load(open(self.config.get('experiment_file'), 'r'))
+        experiments_tracking_file = json.load(open(os.path.join(base_dir, "..", self.config.get('experiment_file')), 'r'))
         model_class = self._load_model(self._find_best_experiment(experiments_tracking_file, model_name))
         return model_class.model
 
@@ -71,13 +72,12 @@ class BaseModel(ABC):
                 if mae < best_mae:
                     best_mae = mae
                     best_experiment = experiment
-
         return best_experiment
 
     @staticmethod
     def _load_model(experiment: dict):
         uuid = experiment['uuid']
-        model_path = os.path.join('experiments', uuid, 'model.pkl')
+        model_path = os.path.join(base_dir, '..', 'experiments', uuid, 'model.pkl')
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found: {model_path}")
 
@@ -160,7 +160,7 @@ class LinearRegressionModel(BaseModel):
 
 
 class DiamondsPipeline:
-    def __init__(self, input_data: pd.DataFrame, config: Config = default_config, model_name: str = 'regression'):
+    def __init__(self, input_data: pd.DataFrame, config: Config = default_config, model_name: str = 'regression', load_trained_model: bool = False):
         """
         Initializes the TrainingPipeline object with input data and configuration.
 
@@ -175,7 +175,7 @@ class DiamondsPipeline:
         self.data = Data(input_data, config=default_config, model_name=model_name)
         self.data.preprocess()
 
-        self.model = ModelFactory.get_model(model_name)
+        self.model = ModelFactory.get_model(model_name, load_trained_model)
         os.makedirs(self.config.get("experiment_directory"), exist_ok=True)
 
     def train(self) -> Tuple[str, float, float]:
@@ -195,6 +195,9 @@ class DiamondsPipeline:
 
         logger.info("Training pipeline completed.")
         return experiment_id, r2, mae
+
+    def predict(self) -> np.ndarray:
+        return self.model.predict(self.data.X_train)
 
     def _log_experiment(self, r2: float, mae: float) -> str:
         """

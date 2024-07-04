@@ -1,5 +1,8 @@
+import os
 import json
 from typing import Any, Dict, Optional
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class Config:
@@ -54,4 +57,4 @@ class Config:
 
 
 # Load the default configuration
-default_config = Config("config.json")
+default_config = Config(os.path.join(base_dir, "..", "config.json"))
