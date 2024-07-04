@@ -7,6 +7,7 @@ import logging
 import pandas as pd
 import numpy as np
 
+from abc import ABC, abstractmethod
 from typing import Tuple
 from datetime import datetime
 
@@ -20,13 +21,33 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-class Model:
-    def __init__(self):
+class BaseModel(ABC):
+    model = None
+    config: Config = default_config
+
+    @abstractmethod
+    def train(self, X: pd.DataFrame, y: pd.Series) -> None:
+        pass
+
+    @abstractmethod
+    def predict(self, X: pd.DataFrame, log_y: bool = True) -> np.ndarray:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def evaluate(y: pd.Series, y_predicted: np.ndarray) -> Tuple[float, float]:
+        pass
+
+
+class LinearRegressionModel(BaseModel):
+    def __init__(self) -> None:
         """
         Initializes the Model object.
         """
+        self.model_name = self.__class__.__name__
+
         self.model = LinearRegression()
-        self.model_name = type(self.model).__name__
+
         self.model_params = self.model.get_params()
 
     def train(self, X: pd.DataFrame, y: pd.Series) -> None:
@@ -90,7 +111,7 @@ class TrainingPipeline:
         self.data = Data(input_data, config)
         self.data.preprocess(log_y=self.config.get('log_y'))
 
-        self.model = Model()
+        self.model = LinearRegressionModel()
         os.makedirs(self.config.get("experiment_directory"), exist_ok=True)
 
     def train(self) -> Tuple[str, float, float]:
