@@ -97,18 +97,18 @@ Ensure your dataset include the following columns:
 if any unexpected column is found, the pipeline will raise an error.
 Also, ensure the columns have the correct type.
 
-#### Step 2: Run the Pipeline
+#### Step 2: Run the Training Pipeline
 You can run the training pipeline using the following Python code:
 
 ```python
 import pandas as pd
-from src.models import TrainingPipeline
+from src.models import DiamondsPipeline
 
 # Load the dataset
 df = pd.read_csv('yourfile.csv')
 
 # Initialize the training pipeline
-pipeline = TrainingPipeline(input_data=df)
+pipeline = DiamondsPipeline(input_data=df, model_name='XGBoostModel')
 
 # Train the model
 experiment_id, r2, mae = pipeline.train()
@@ -117,6 +117,8 @@ print(f"Experiment ID: {experiment_id}")
 print(f"R2 Score: {r2}")
 print(f"Mean Absolute Error: {mae}")
 ```
+You can choose between XGBoostModel and LinearRegressionModel.
+
 
 Alternatively, you can run the run.py script which uses the data/diamonds.csv file:
 
@@ -133,7 +135,7 @@ Following a log record of an experiment:
     "uuid": "05a9ec3b-3552-421c-92ec-2017f6b95b6e",
     "timestamp": "2024-06-29T22:26:14.730766",
     "date": "2024-06-29 22:26",
-    "model_name": "LinearRegression",
+    "model_name": "LinearRegressionModel",
     "model_params": {
         "copy_X": true,
         "fit_intercept": true,
@@ -141,8 +143,124 @@ Following a log record of an experiment:
         "positive": false
     },
     "results": {
-        "r2": 0.9074,
-        "mae": 557.98
+        "r2": 0.8074,
+        "mae": 511257.98
     }
 }
 ```
+
+#### Step 3: Run the API and obtain predictions and similar diamonds
+If you want to predcit the value of a new diamond or retrieve the most similar ones already in the database you can use the API.
+You can run it using the following commmand at the project directory:
+
+```bash
+uvicorn src.main:app --host 0.0.0.0 --port 8000
+```
+
+Once the application startup is complete, you can interact with the API using various methods. The easiest way to explore and test the API endpoints is through the automatically generated Swagger UI.
+
+**Accessing the Swagger UI**
+
+	1.	Open Your Browser: Once the server is running, open your web browser.
+	2.	Navigate to the Swagger UI: Go to http://localhost:8000/docs.
+
+The Swagger UI provides a graphical interface where you can interact with the API. You can see all available endpoints, their request parameters, and try them out directly from the browser.
+
+**API Endpoints**
+
+The API provides the following main endpoints:
+
+	1.	Predict the Price of a Diamond: /predict
+	2.	Search for Similar Diamonds: /search_diamonds
+
+**Endpoint Details**
+
+***1. Predict the Price of a Diamond***
+
+	•	Endpoint: /predict
+	•	Method: POST
+	•	Description: Predict the price of a diamond based on its features.
+
+Request Payload:
+```json
+{
+  "model": "XGBoostModel",  // or LinearRegressionModel
+  "features": {
+    "carat": 0.23,
+    "cut": "Ideal",
+    "color": "E",
+    "clarity": "SI2",
+    "depth": null,
+    "table": null,
+    "x": 3.95,
+    "y": 3.98,
+    "z": 2.43
+  }
+}
+```
+
+Example Using Swagger:
+
+	1.	In the Swagger UI, locate the /predict endpoint.
+	2.	Click on the endpoint to expand it.
+	3.	Click on the “Try it out” button.
+	4.	Enter the required details in the request payload.
+	5.	Click on the “Execute” button to send the request and see the response.
+
+Response:
+
+Success:
+
+```json
+{
+  "prediction": 1500.0  // Example predicted price
+}
+```
+Error: If there are any issues with the request, you will receive an appropriate HTTP status code and error message.
+
+2. Search for Similar Diamonds
+
+	•	Endpoint: /search_diamonds
+	•	Method: POST
+	•	Description: Given the features of a diamond, return n samples from the training dataset with the same cut, color, and clarity, and the most similar weight.
+
+Request Payload:
+```json
+{
+  "carat": 0.23,
+  "cut": "Ideal",
+  "color": "E",
+  "clarity": "SI2",
+  "n": 5
+}
+```
+
+Example Using Swagger:
+
+	1.	In the Swagger UI, locate the /search_diamonds endpoint.
+	2.	Click on the endpoint to expand it.
+	3.	Click on the “Try it out” button.
+	4.	Enter the required details in the request payload.
+	5.	Click on the “Execute” button to send the request and see the response.
+
+Response:
+```json
+[
+  {
+    "index": 5,
+    "carat": 0.23,
+    "cut": "Ideal",
+    "color": "E",
+    "clarity": "SI2",
+    "depth": 61.5,
+    "table": 55.0,
+    "x": 3.95,
+    "y": 3.98,
+    "z": 2.43
+  },
+  // Additional similar diamond records
+]
+```
+
+Error: If there are no matching diamonds, or if there are any issues with the request, you will receive an appropriate HTTP status code and error message.
+# FIXME: adjust md style ma devo cenare
