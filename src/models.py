@@ -26,6 +26,22 @@ class BaseModel(ABC):
     model = None
     config: Config = default_config
 
+    def __init__(self, model_name: str, load_trained_model: bool = True, config: Config = default_config) -> None:
+        """
+        Initializes the Model object.
+        """
+        self.model_name = model_name
+
+        self.config = config
+        self.model_config = self.config.get_model_config(self.model_name)
+
+        if load_trained_model:
+            self.model = self.load_best_model(self.model_name)
+            self.model_params = self.model.get_params()
+        else:
+            self.model = None
+            self.model_params = None
+
     @abstractmethod
     def train(self, X: pd.DataFrame, y: pd.Series) -> None:
         pass
@@ -39,31 +55,58 @@ class BaseModel(ABC):
     def evaluate(y: pd.Series, y_predicted: np.ndarray) -> Tuple[float, float]:
         pass
 
+    def load_best_model(self, model_name: str):
+        experiments_tracking_file = json.load(open(self.config.get('experiment_file'), 'r'))
+        model_class = self._load_model(self._find_best_experiment(experiments_tracking_file, model_name))
+        return model_class.model
+
+    @staticmethod
+    def _find_best_experiment(data: list, model_name: str) -> dict:
+        best_experiment = None
+        best_mae = float('inf')
+
+        for experiment in data:
+            if experiment['model_name'] == model_name:
+                mae = experiment['results']['mae']
+                if mae < best_mae:
+                    best_mae = mae
+                    best_experiment = experiment
+
+        return best_experiment
+
+    @staticmethod
+    def _load_model(experiment: dict):
+        uuid = experiment['uuid']
+        model_path = os.path.join('experiments', uuid, 'model.pkl')
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found: {model_path}")
+
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
+
+        logger.info(f"Loaded model from {model_path}")
+
+        return model
+
 
 class ModelFactory:
     @staticmethod
-    def get_model(model_type: str) -> BaseModel:
+    def get_model(model_type: str, load_trained_model: bool = False) -> BaseModel:
         if model_type == 'LinearRegressionModel':
-            return LinearRegressionModel()
+            return LinearRegressionModel(load_trained_model)
         elif model_type == 'XGBoostModel':
-            return XGBoostModel()
+            return XGBoostModel(load_trained_model)
         else:
             raise ValueError(f"Model type '{model_type}' is not supported.")
 
 
 class LinearRegressionModel(BaseModel):
-    def __init__(self, config: Config = default_config) -> None:
+    def __init__(self, load_trained_model: bool = True, config: Config = default_config) -> None:
         """
         Initializes the Model object.
         """
         self.model_name = self.__class__.__name__
-
-        self.config = config
-        self.model_config = self.config.get_model_config(self.model_name)
-
-        self.model = LinearRegression()
-
-        self.model_params = self.model.get_params()
+        super().__init__(model_name=self.model_name, load_trained_model=load_trained_model, config=config)
 
     def train(self, X: pd.DataFrame, y: pd.Series) -> None:
         """
@@ -74,6 +117,8 @@ class LinearRegressionModel(BaseModel):
             y (pd.Series): The training target.
         """
         logger.info("Starting model training.")
+        self.model = LinearRegression()
+        self.model_params = self.model.get_params()
         self.model.fit(X, y)
         logger.info("Model training completed.")
 
@@ -209,18 +254,15 @@ class DiamondsPipeline:
 
 
 class XGBoostModel(BaseModel):
-    def __init__(self, config: Config = default_config):
+    def __init__(self, load_trained_model: bool = True, config: Config = default_config):
         self.model_name = self.__class__.__name__
+        super().__init__(model_name=self.model_name, load_trained_model=load_trained_model, config=config)
 
-        self.config = config
-        self.model_config = self.config.get_model_config(self.model_name)
-
-        self.model = xgb.XGBRegressor(enable_categorical=True, random_state=42)
-
-        self.model_params = self.model.get_params()
 
     def train(self, X: pd.DataFrame, y: pd.Series) -> None:
         logger.info("Starting XGBoost model training.")
+        self.model = xgb.XGBRegressor(enable_categorical=True, random_state=42)
+        self.model_params = self.model.get_params()
         self.model.fit(X, y)
         logger.info("XGBoost model training completed.")
 
