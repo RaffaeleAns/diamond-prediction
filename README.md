@@ -67,7 +67,7 @@ Observability is key. Save every request and response made to the APIs to a **pr
 
 ---
 
-## How to run
+# How to run
 ### Prerequisites
 Before running the pipeline, ensure you have the following:
 
@@ -80,8 +80,8 @@ You can install the required packages using the following command:
 pip install requirements.txt
 ```
 
-### Getting started
-#### Step 1: Prepare your dataset
+## Getting started
+### Step 1: Prepare your dataset
 
 Ensure your dataset include the following columns:
 
@@ -89,6 +89,8 @@ Ensure your dataset include the following columns:
 - cut: str
 - color: str
 - clarity: str
+- depth: float (mandatory only for XGBoost)
+- table: float (mandatory only for XGBoost)
 - x: float
 - y: float
 - z: float
@@ -97,7 +99,7 @@ Ensure your dataset include the following columns:
 if any unexpected column is found, the pipeline will raise an error.
 Also, ensure the columns have the correct type.
 
-#### Step 2: Run the Training Pipeline
+### Step 2: Run the Training Pipeline
 You can run the training pipeline using the following Python code:
 
 ```python
@@ -149,9 +151,9 @@ Following a log record of an experiment:
 }
 ```
 
-#### Step 3: Run the API and obtain predictions and similar diamonds
-If you want to predcit the value of a new diamond or retrieve the most similar ones already in the database you can use the API.
-You can run it using the following commmand at the project directory:
+### Step 3: Run the API and Obtain Predictions and Similar Diamonds
+
+If you want to predict the value of a new diamond or retrieve the most similar ones already in the database, you can use the API. You can run it using the following command at the project directory:
 
 ```bash
 uvicorn src.main:app --host 0.0.0.0 --port 8000
@@ -159,32 +161,32 @@ uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 Once the application startup is complete, you can interact with the API using various methods. The easiest way to explore and test the API endpoints is through the automatically generated Swagger UI.
 
-**Accessing the Swagger UI**
+#### Accessing the Swagger UI
 
-	1.	Open Your Browser: Once the server is running, open your web browser.
-	2.	Navigate to the Swagger UI: Go to http://localhost:8000/docs.
+1. **Open Your Browser**: Once the server is running, open your web browser.
+2. **Navigate to the Swagger UI**: Go to `http://localhost:8000/docs`.
 
-The Swagger UI provides a graphical interface where you can interact with the API. You can see all available endpoints, their request parameters, and try them out directly from the browser.
+The Swagger UI (`http://localhost:8000/docs`) provides a graphical interface where you can interact with the API. You can see all available endpoints, their request parameters, and try them out directly from the browser.
 
-**API Endpoints**
+#### API Endpoints
 
 The API provides the following main endpoints:
 
-	1.	Predict the Price of a Diamond: /predict
-	2.	Search for Similar Diamonds: /search_diamonds
+1. **Predict the Price of a Diamond**: `/predict`
+2. **Search for Similar Diamonds**: `/search_diamonds`
 
-**Endpoint Details**
+#### Endpoint Details
 
-***1. Predict the Price of a Diamond***
+##### 1. Predict the Price of a Diamond
 
-	•	Endpoint: /predict
-	•	Method: POST
-	•	Description: Predict the price of a diamond based on its features.
+- **Endpoint**: `/predict`
+- **Method**: POST
+- **Description**: Predict the price of a diamond based on its features.
 
-Request Payload:
+**Request Payload**:
 ```json
 {
-  "model": "XGBoostModel",  // or LinearRegressionModel
+  "model": "linear_regression",  // or another model name if applicable
   "features": {
     "carat": 0.23,
     "cut": "Ideal",
@@ -199,32 +201,29 @@ Request Payload:
 }
 ```
 
-Example Using Swagger:
+**Example Using Swagger**:
+1. In the Swagger UI, locate the `/predict` endpoint.
+2. Click on the endpoint to expand it.
+3. Click on the "Try it out" button.
+4. Enter the required details in the request payload.
+5. Click on the "Execute" button to send the request and see the response.
 
-	1.	In the Swagger UI, locate the /predict endpoint.
-	2.	Click on the endpoint to expand it.
-	3.	Click on the “Try it out” button.
-	4.	Enter the required details in the request payload.
-	5.	Click on the “Execute” button to send the request and see the response.
+**Response**:
+- **Success**:
+  ```json
+  {
+    "prediction": 1500.0  // Example predicted price
+  }
+  ```
+- **Error**: If there are any issues with the request, you will receive an appropriate HTTP status code and error message.
 
-Response:
+##### 2. Search for Similar Diamonds
 
-Success:
+- **Endpoint**: `/search_diamonds`
+- **Method**: POST
+- **Description**: Given the features of a diamond, return `n` samples from the training dataset with the same cut, color, and clarity, and the most similar weight.
 
-```json
-{
-  "prediction": 1500.0  // Example predicted price
-}
-```
-Error: If there are any issues with the request, you will receive an appropriate HTTP status code and error message.
-
-2. Search for Similar Diamonds
-
-	•	Endpoint: /search_diamonds
-	•	Method: POST
-	•	Description: Given the features of a diamond, return n samples from the training dataset with the same cut, color, and clarity, and the most similar weight.
-
-Request Payload:
+**Request Payload**:
 ```json
 {
   "carat": 0.23,
@@ -235,32 +234,30 @@ Request Payload:
 }
 ```
 
-Example Using Swagger:
+**Example Using Swagger**:
+1. In the Swagger UI, locate the `/search_diamonds` endpoint.
+2. Click on the endpoint to expand it.
+3. Click on the "Try it out" button.
+4. Enter the required details in the request payload.
+5. Click on the "Execute" button to send the request and see the response.
 
-	1.	In the Swagger UI, locate the /search_diamonds endpoint.
-	2.	Click on the endpoint to expand it.
-	3.	Click on the “Try it out” button.
-	4.	Enter the required details in the request payload.
-	5.	Click on the “Execute” button to send the request and see the response.
-
-Response:
-```json
-[
-  {
-    "index": 5,
-    "carat": 0.23,
-    "cut": "Ideal",
-    "color": "E",
-    "clarity": "SI2",
-    "depth": 61.5,
-    "table": 55.0,
-    "x": 3.95,
-    "y": 3.98,
-    "z": 2.43
-  },
-  // Additional similar diamond records
-]
-```
-
-Error: If there are no matching diamonds, or if there are any issues with the request, you will receive an appropriate HTTP status code and error message.
-# FIXME: adjust md style ma devo cenare
+**Response**:
+- **Success**:
+  ```json
+  [
+    {
+      "index": 5,
+      "carat": 0.23,
+      "cut": "Ideal",
+      "color": "E",
+      "clarity": "SI2",
+      "depth": 61.5,
+      "table": 55.0,
+      "x": 3.95,
+      "y": 3.98,
+      "z": 2.43
+    },
+    // Additional similar diamond records
+  ]
+  ```
+- **Error**: If there are no matching diamonds, or if there are any issues with the request, you will receive an appropriate HTTP status code and error message.
