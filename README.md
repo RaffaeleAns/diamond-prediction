@@ -186,7 +186,7 @@ The API provides the following main endpoints:
 **Request Payload**:
 ```json
 {
-  "model": "linear_regression",  // or another model name if applicable
+  "model": "linear_regression", 
   "features": {
     "carat": 0.23,
     "cut": "Ideal",
@@ -212,7 +212,7 @@ The API provides the following main endpoints:
 - **Success**:
   ```json
   {
-    "prediction": 1500.0  // Example predicted price
+    "prediction": 1500.0  
   }
   ```
 - **Error**: If there are any issues with the request, you will receive an appropriate HTTP status code and error message.
@@ -257,7 +257,6 @@ The API provides the following main endpoints:
       "y": 3.98,
       "z": 2.43
     },
-    // Additional similar diamond records
   ]
   ```
 - **Error**: If there are no matching diamonds, or if there are any issues with the request, you will receive an appropriate HTTP status code and error message.
