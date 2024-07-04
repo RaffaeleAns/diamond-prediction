@@ -176,7 +176,7 @@ class DiamondsPipeline:
         self.data.preprocess()
 
         self.model = ModelFactory.get_model(model_name, load_trained_model)
-        os.makedirs(self.config.get("experiment_directory"), exist_ok=True)
+
 
     def train(self) -> Tuple[str, float, float]:
         """
@@ -225,6 +225,7 @@ class DiamondsPipeline:
             }
         }
 
+        os.makedirs(self.config.get("experiment_directory"), exist_ok=True)
         experiment_file = self.config.get("experiment_file")
         if os.path.exists(experiment_file):
             with open(experiment_file, "r") as file:
