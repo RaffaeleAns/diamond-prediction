@@ -8,7 +8,7 @@ import pandas as pd
 from typing import Optional
 from pydantic import BaseModel
 
-from payloads import Features, Target
+from src.payloads import Features, Target
 from src.utils import Config, default_config
 
 base_dir = os.path.dirname(os.path.abspath(__file__))

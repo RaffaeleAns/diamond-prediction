@@ -4,7 +4,7 @@ import pandas as pd
 
 from fastapi import FastAPI, HTTPException
 
-from payloads import PredictPayload, SimilarityPayload
+from src.payloads import PredictPayload, SimilarityPayload
 from src.models import DiamondsPipeline
 
 
