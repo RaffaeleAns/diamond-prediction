@@ -77,7 +77,7 @@ Before running the pipeline, ensure you have the following:
 You can install the required packages using the following command:
 
 ```bash
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Getting started

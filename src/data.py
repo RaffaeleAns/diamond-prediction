@@ -75,7 +75,7 @@ class Data:
         self.X_val: Optional[pd.DataFrame] = None
         self.y_val: Optional[pd.Series] = None
 
-        self.data = data
+        self.data = data.copy()
         self.config = config
         self.model_config = self.config.get_model_config(model_name)
 
