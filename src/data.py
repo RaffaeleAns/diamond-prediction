@@ -105,7 +105,7 @@ class Data:
         """
         logger.info(f"Loading validation data from {validation_X_path} and {validation_y_path}.")
         self.X_val = pd.read_parquet(validation_X_path)
-        self.y_val = pd.read_parquet(validation_y_path)
+        self.y_val = pd.read_parquet(validation_y_path)['price']
         logger.info("Validation data loaded successfully.")
 
     def preprocess(self) -> None:
@@ -120,6 +120,18 @@ class Data:
         if self.model_config.get('get_dummies'):
             logger.info("Applying get_dummies to categorical columns.")
             self.data = pd.get_dummies(self.data, columns=['cut', 'color', 'clarity'], drop_first=True)
+
+        if self.model_config.get('get_categorical'):
+            logger.info("Applying pd.Categorical to numerical columns.")
+            self.data['cut'] = pd.Categorical(self.data['cut'],
+                                                           categories=['Fair', 'Good', 'Very Good', 'Ideal', 'Premium'],
+                                                           ordered=True)
+            self.data['color'] = pd.Categorical(self.data['color'],
+                                                             categories=['D', 'E', 'F', 'G', 'H', 'I', 'J'],
+                                                             ordered=True)
+            self.data['clarity'] = pd.Categorical(self.data['clarity'],
+                                                               categories=['IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1',
+                                                                           'SI2', 'I1'], ordered=True)
 
         if self.model_config.get('log_y'):
             logger.info("Applying logarithmic transformation to the target variable.")

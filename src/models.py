@@ -6,6 +6,7 @@ import logging
 
 import pandas as pd
 import numpy as np
+import xgboost as xgb
 
 from abc import ABC, abstractmethod
 from typing import Tuple
@@ -39,8 +40,19 @@ class BaseModel(ABC):
         pass
 
 
+class ModelFactory:
+    @staticmethod
+    def get_model(model_type: str) -> BaseModel:
+        if model_type == 'LinearRegressionModel':
+            return LinearRegressionModel()
+        elif model_type == 'XGBoostModel':
+            return XGBoostModel()
+        else:
+            raise ValueError(f"Model type '{model_type}' is not supported.")
+
+
 class LinearRegressionModel(BaseModel):
-    def __init__(self, config : Config = default_config) -> None:
+    def __init__(self, config: Config = default_config) -> None:
         """
         Initializes the Model object.
         """
@@ -48,7 +60,6 @@ class LinearRegressionModel(BaseModel):
 
         self.config = config
         self.model_config = self.config.get_model_config(self.model_name)
-
 
         self.model = LinearRegression()
 
@@ -103,20 +114,23 @@ class LinearRegressionModel(BaseModel):
         return r2, mae
 
 
-class TrainingPipeline:
-    def __init__(self, input_data: pd.DataFrame, model_name: str, config: Config = default_config):
+class DiamondsPipeline:
+    def __init__(self, input_data: pd.DataFrame, config: Config = default_config, model_name: str = 'regression'):
         """
         Initializes the TrainingPipeline object with input data and configuration.
 
         Args:
             input_data (pd.DataFrame): The input data for training.
             config (Config): The configuration object.
+            model_name (str, optional): Name of the model. Defaults to 'regression'.
         """
         self.config = config
-        self.data = Data(input_data, model_name, config)
+        self.model_config = self.config.get_model_config(model_name)
+
+        self.data = Data(input_data, config=default_config, model_name=model_name)
         self.data.preprocess()
 
-        self.model = LinearRegressionModel()
+        self.model = ModelFactory.get_model(model_name)
         os.makedirs(self.config.get("experiment_directory"), exist_ok=True)
 
     def train(self) -> Tuple[str, float, float]:
@@ -192,3 +206,32 @@ class TrainingPipeline:
         with open(model_path, "wb") as file:
             pickle.dump(self.model, file)
         logger.info("Model saved successfully.")
+
+
+class XGBoostModel(BaseModel):
+    def __init__(self, config: Config = default_config):
+        self.model_name = self.__class__.__name__
+
+        self.config = config
+        self.model_config = self.config.get_model_config(self.model_name)
+
+        self.model = xgb.XGBRegressor(enable_categorical=True, random_state=42)
+
+        self.model_params = self.model.get_params()
+
+    def train(self, X: pd.DataFrame, y: pd.Series) -> None:
+        logger.info("Starting XGBoost model training.")
+        self.model.fit(X, y)
+        logger.info("XGBoost model training completed.")
+
+    def predict(self, X: pd.DataFrame, log_y: bool = False) -> np.ndarray:
+        logger.info("Making predictions with XGBoost model.")
+        return self.model.predict(X)
+
+    @staticmethod
+    def evaluate(y: pd.Series, y_predicted: np.ndarray) -> Tuple[float, float]:
+        logger.info("Evaluating XGBoost model performance.")
+        r2 = round(r2_score(y, y_predicted), 4)
+        mae = round(mean_absolute_error(y, y_predicted), 2)
+        logger.info(f"XGBoost model evaluation completed. R2: {r2}, MAE: {mae}")
+        return r2, mae

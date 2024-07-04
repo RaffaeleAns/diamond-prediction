@@ -10,7 +10,16 @@
        "color_E", "color_F", "color_G", "color_H", "color_I", "color_J",
        "clarity_IF", "clarity_SI1", "clarity_SI2", "clarity_VS1",
        "clarity_VS2", "clarity_VVS1", "clarity_VVS2"],
-          "validation_x_path": "data/support/diamonds_regression_x_val.parquet",
+        "validation_x_path": "data/support/diamonds_regression_x_val.parquet",
     "validation_y_path": "data/support/diamonds_regression_y_val.parquet"
+      },
+      "XGBoostModel": {
+        "log_y": false,
+        "get_dummies": false,
+        "get_categorical": true,
+        "training_features": ["carat", "cut", "color", "clarity", "depth", "table", "x", "y", "z"],
+        "validation_x_path": "data/support/diamonds_xgboost_x_val.parquet",
+    "validation_y_path": "data/support/diamonds_xgboost_y_val.parquet"
       }
-}}
+    }
+}
