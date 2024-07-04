@@ -11,13 +11,20 @@ from src.models import DiamondsPipeline
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-app = FastAPI()
+app = FastAPI(
+    title="Diamond Prediction API",
+    description="An API to predict diamond prices and find similar diamonds based on given features.",
+    version="1.0.0"
+)
 
 
-@app.post("/predict")
+@app.post("/predict", summary="Predict Diamond Price", response_description="Predicted price of the diamond")
 def predict(request: PredictPayload):
     """
     Predict the price of a diamond based on its features.
+
+    - **model**: The name of the model to use for prediction.
+    - **features**: The features of the diamond (carat, cut, color, clarity, etc.).
     """
     features_dict = request.features.model_dump(exclude_none=True)
     df = pd.DataFrame([features_dict])
@@ -27,13 +34,18 @@ def predict(request: PredictPayload):
     return {'prediction': float(pipeline.predict()[0])}
 
 
-@app.post("/search_diamonds")
+@app.post("/search_diamonds", summary="Search Similar Diamonds", response_description="List of similar diamonds")
 def search_diamonds(request: SimilarityPayload):
     """
     Given the features of a diamond, return n samples from the training dataset
     with the same cut, color, and clarity, and the most similar weight.
-    """
 
+    - **carat**: Carat weight of the diamond.
+    - **cut**: Cut quality of the diamond.
+    - **color**: Color grade of the diamond.
+    - **clarity**: Clarity grade of the diamond.
+    - **n**: Number of similar diamonds to return.
+    """
     df = pd.read_csv(os.path.join(base_dir, "..", "data", "diamonds.csv"))
 
     filtered_df = df[
