@@ -15,5 +15,5 @@ y = diamonds_dummy.price
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
-y_test.to_csv('../data/support/diamonds_y_val.csv', sep =';')
-x_test.to_csv('../data/support/diamonds_x_val.csv', sep =';')
+y_test.to_frame().to_parquet('../data/support/diamonds_regression_y_val.parquet')
+x_test.to_parquet('../data/support/diamonds_regression_x_val.parquet')

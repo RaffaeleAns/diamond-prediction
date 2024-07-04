@@ -102,8 +102,8 @@ class Data:
             validation_y_path (str): Path to the validation target CSV file.
         """
         logger.info(f"Loading validation data from {validation_X_path} and {validation_y_path}.")
-        self.X_val = pd.read_csv(validation_X_path, sep=';', index_col=0)
-        self.y_val = pd.read_csv(validation_y_path, sep=';', index_col=0)
+        self.X_val = pd.read_parquet(validation_X_path)
+        self.y_val = pd.read_parquet(validation_y_path)
         logger.info("Validation data loaded successfully.")
 
     def preprocess(self) -> None:
